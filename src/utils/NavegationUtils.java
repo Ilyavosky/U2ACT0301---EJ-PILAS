@@ -1,49 +1,63 @@
 package utils;
 
 import models.Navegation;
-
 import java.util.Stack;
 
 public class NavegationUtils {
-    private Stack<Navegation> Forward ;
-    private Stack<Navegation> Backwards;
+    private Stack<Navegation> forwardStack;
+    private Stack<Navegation> backwardsStack;
     private Navegation currentPage;
 
     public NavegationUtils() {
-        this.Forward = new Stack<>();
-        this.Backwards = new Stack<>();
+        this.forwardStack = new Stack<>();
+        this.backwardsStack = new Stack<>();
         this.currentPage = null;
     }
 
-    //Métodos que usé
-    //push(E item): This method adds an element (item) to the top of the stack. It returns the item that was pushed.
-    //pop(): This method removes and returns the element at the top of the stack. If the stack is empty, it throws an EmptyStackException.
-    //peek(): This method returns the element at the top of the stack without removing it. If the stack is empty, it throws an EmptyStackException.
+    public void goToNewPage(Navegation newPage) {
+        System.out.println("Navegando a la página: " + newPage.getUrl());
 
-    public void goToPage(){
-        if (this.currentPage != null){
-            this.Forward.push(this.currentPage);
+        if (this.currentPage != null) {
+            this.backwardsStack.push(this.currentPage);
         }
 
-        if (this.currentPage == null){
-            this.Backwards.push(this.Forward.pop());
-        }
+        this.currentPage = newPage;
+        this.forwardStack.clear();
     }
 
-    public void returnToPage(){
-        if (this.currentPage == null){
-            this.Backwards.push(this.Forward.pop());
+    public void goBackwards() {
+        if (this.backwardsStack.isEmpty()) {
+            System.out.println("No se puede retroceder más.");
+            return;
         }
 
-        if (this.currentPage.equals(this.Backwards.peek())){
-            this.Backwards.pop();
+        if (this.currentPage != null) {
+            this.forwardStack.push(this.currentPage);
         }
+
+        this.currentPage = this.backwardsStack.pop();
+        System.out.println("Retrocediendo a: " + this.currentPage.getUrl());
     }
 
-    public void goBackAndForward(Navegation navegation){
-       if (this.currentPage.equals(this.Backwards.peek())){
-           this.Backwards.push(navegation);
-       }
+    public void goForwards() {
+        if (this.forwardStack.isEmpty()) {
+            System.out.println("No se puede avanzar más.");
+            return;
+        }
+
+        if (this.currentPage != null) {
+            this.backwardsStack.push(this.currentPage);
+        }
+
+        this.currentPage = this.forwardStack.pop();
+        System.out.println("-> Avanzando a: " + this.currentPage.getUrl());
     }
 
+    public void mostrarEstadoActual() {
+        System.out.println("---------------------------------");
+        System.out.println("Pila Atrás (Backwards): " + this.backwardsStack.size() + " elementos");
+        System.out.println("Página Actual (Current): " + (this.currentPage != null ? this.currentPage.getUrl() : "Ninguna"));
+        System.out.println("Pila Adelante (Forward): " + this.forwardStack.size() + " elementos");
+        System.out.println("---------------------------------");
+    }
 }
